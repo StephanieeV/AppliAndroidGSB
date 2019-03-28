@@ -29,5 +29,6 @@
         <activity android:name=".EtapeActivity" />
 
     </application>
+    <uses_permission android:name="android.permission.INTERNET"/>
 
 </manifest>
