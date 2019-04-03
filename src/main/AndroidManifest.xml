@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="fr.cned.emdsgil.suividevosfrais">
 
     <application
@@ -11,14 +12,11 @@
         android:theme="@style/AppTheme"
         android:fullBackupContent="@xml/my_backup_rules">
         <activity android:name=".MainActivity">
-            <intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http"
-                    android:host="recipe-app.com"
-                    android:pathPrefix="/recipes" />
             </intent-filter>
         </activity>
         <activity android:name=".HfActivity" />
@@ -27,8 +25,9 @@
         <activity android:name=".RepasActivity" />
         <activity android:name=".NuiteeActivity" />
         <activity android:name=".EtapeActivity" />
+        <activity android:name=".SyncActivity" />
 
     </application>
-    <uses_permission android:name="android.permission.INTERNET"/>
+
 
 </manifest>

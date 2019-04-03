@@ -1,6 +1,10 @@
 package fr.cned.emdsgil.suividevosfrais;
 
+import org.json.JSONArray;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Classe métier contenant la description d'un frais hors forfait
@@ -29,5 +33,6 @@ class FraisHf  implements Serializable {
 	public Integer getJour() {
 		return jour;
 	}
+
 
 }

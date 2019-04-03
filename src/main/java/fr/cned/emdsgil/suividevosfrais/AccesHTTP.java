@@ -29,6 +29,7 @@ public class AccesHTTP extends AsyncTask<String, Integer, Long> {
      * Constructeur
      */
     public AccesHTTP(){
+
         parametres = new ArrayList<NameValuePair>();
     }
 
@@ -72,6 +73,7 @@ public class AccesHTTP extends AsyncTask<String, Integer, Long> {
 
     @Override
     protected void onPostExecute(Long result){
+
         delegate.processFinish((ret.toString()));
     }
 

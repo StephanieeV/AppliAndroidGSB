@@ -1,7 +1,10 @@
 package fr.cned.emdsgil.suividevosfrais;
 
+import org.json.JSONArray;
+
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Classe métier contenant les informations des frais d'un mois
@@ -100,5 +103,6 @@ class FraisMois implements Serializable {
     public ArrayList<FraisHf> getLesFraisHf() {
         return lesFraisHf;
     }
+
 
 }

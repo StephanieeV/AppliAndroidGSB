@@ -1,5 +1,6 @@
 package fr.cned.emdsgil.suividevosfrais;
 
+
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -7,7 +8,8 @@ import org.json.JSONArray;
 public class AccesDistant implements AsyncResponse{
 
     // constante
-    private static final String SERVERADDR = "http://192.168.0.15/appandroid/serveurappandroid.php";
+    private static final String SERVERADDR = "http://192.168.0.15/appandroid/serveur.php";
+
 
     public AccesDistant(){
         super();
@@ -41,13 +43,14 @@ public class AccesDistant implements AsyncResponse{
         }
     }
 
-    public void envoi(String operation, JSONArray lesDonneesJSON){
+    public void envoi(String operation, JSONArray authJSON, JSONArray lesFraisJSON){
         AccesHTTP accesDonnees = new AccesHTTP();
         // lien de délégation
         accesDonnees.delegate = this;
         // ajout parametres
         accesDonnees.addParam("operation", operation);
-        accesDonnees.addParam("lesdonnees", lesDonneesJSON.toString());
+        accesDonnees.addParam("lesdonnees", lesFraisJSON.toString());
+        accesDonnees.addParam("auth", authJSON.toString());
         // appel au serveur
         accesDonnees.execute(SERVERADDR);
     }

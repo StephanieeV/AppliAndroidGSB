@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         cmdMenu_clic(((ImageButton) findViewById(R.id.cmdEtape)), EtapeActivity.class);
         cmdMenu_clic(((ImageButton) findViewById(R.id.cmdHf)), HfActivity.class);
         cmdMenu_clic(((ImageButton) findViewById(R.id.cmdHfRecap)), HfRecapActivity.class);
-        cmdTransfert_clic();
+        cmdMenu_clic(((ImageButton) findViewById(R.id.cmdTransfert)), SyncActivity.class);
     }
 
     @Override
@@ -82,13 +82,16 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Cas particulier du bouton pour le transfert d'informations vers le serveur
-     */
-    private void cmdTransfert_clic() {
+
+    private void cmdTransfert_clic(ImageButton button, final Class classe) {
         findViewById(R.id.cmdTransfert).setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 // envoi les informations sérialisées vers le serveur
                 // en construction
+                // ouvre l'activité
+                Intent intent = new Intent(MainActivity.this, classe);
+                startActivity(intent);
             }
         });
-    }
+    }*/
 }
