@@ -2,36 +2,36 @@ package fr.cned.emdsgil.suividevosfrais;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.DatePicker.OnDateChangedListener;
 import android.content.Intent;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Set;
+
 
 public class SyncActivity extends AppCompatActivity {
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sync);
         setTitle("GSB : Synchronisation");
 
-        //accesDistant = new AccesDistant() ;
-        //accesDistant.envoi("dernier", new JSONArray(), new JSONArray());
-
         // chargement des méthodes événementielles
         imgReturn_clic() ;
-        //cmdSync_clic();
+        cmdSync_clic();
 
 
     }
@@ -51,22 +51,68 @@ public class SyncActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * retourne l'idVisiteur et le mdp au format JSON
+     * @return JSONArray
+     */
+    private JSONArray getAuthJSON(){
+        String idVisiteur = ((EditText)findViewById(R.id.txtLogin)).getText().toString();
+        String mdp = ((EditText)findViewById(R.id.txtMdp)).getText().toString();
+        List laListe = new ArrayList();
+        laListe.add(idVisiteur);
+        laListe.add(mdp);
+        return new JSONArray(laListe);
+    }
 
-    //private static AccesDistant accesDistant;
+    /**
+     * retourne toutes les données de frais sérializées au format JSON
+     * @return JSONObject
+     */
+    private JSONArray getLesFraisJSON(){
+        List listeMois = new ArrayList();
+        Set<Integer> keys = Global.listFraisMois.keySet();
+        for (Integer unMois: keys){
+            List listeFraisDuMois = new ArrayList();
+
+            listeFraisDuMois.add(Global.listFraisMois.get(unMois).getEtape());
+            listeFraisDuMois.add(Global.listFraisMois.get(unMois).getKm());
+            listeFraisDuMois.add(Global.listFraisMois.get(unMois).getNuitee());
+            listeFraisDuMois.add(Global.listFraisMois.get(unMois).getRepas());
+
+            List listeLesFraisHf = new ArrayList();
+
+            for (FraisHf unFraisHf : Global.listFraisMois.get(unMois).getLesFraisHf()){
+                List listeInfosDuFraisHf = new ArrayList();
+
+                listeInfosDuFraisHf.add(unFraisHf.getJour());
+                listeInfosDuFraisHf.add(unFraisHf.getMontant());
+                listeInfosDuFraisHf.add(unFraisHf.getMotif());
+
+                listeLesFraisHf.add(listeInfosDuFraisHf);
+            }
+            listeFraisDuMois.add(listeLesFraisHf);
+
+            listeMois.add(listeFraisDuMois);
+        }
+        return new JSONArray(listeMois);
+    }
+
+
 
     /**
      * Sur le clic du bouton synchroniser: synchronisation avec la base de donnée distante
      */
-    /*
+
     private void cmdSync_clic() {
         findViewById(R.id.cmdSync).setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-
-                accesDistant.envoi("enreg", new JSONArray(), new JSONArray());
-                retourActivityPrincipale() ;
+                AccesDistant accesDistant = new AccesDistant();
+                accesDistant.envoi("enreg", getAuthJSON(), getLesFraisJSON());
+                Log.d("auth","************** authJSON : "+ getAuthJSON().toString());
+                Log.d("lesFrais", "*********************** les fraisJSON : " + getLesFraisJSON().toString());
             }
         }) ;
-    }*/
+    }
 
 
     /**
@@ -92,4 +138,11 @@ public class SyncActivity extends AppCompatActivity {
         startActivity(intent) ;
     }
 
+    public void envoieSucces() {
+        Toast.makeText(this, "Les frais ont été pris en compte.", Toast.LENGTH_LONG).show();
+    }
+
+    public void envoieErreur() {
+        Toast.makeText(this, "Identifiant ou mot de passe incorrecte.", Toast.LENGTH_LONG).show();
+    }
 }
