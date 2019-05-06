@@ -1,68 +1,72 @@
 <?php
 
-include '../includes/class.pdogsb.inc.php';
-include '../includes/fct.inc.php';
+require_once 'fct.inc.php';
+require_once 'class.pdogsb.inc.php';
+$pdo = PdoGsb::getPdoGsb();
 
-// contrôle de réception de paramètre
-if(isset($_REQUEST["operation"])){
-	if($_REQUEST["operation"]== "connexion"){
-		try{
-			print "connexion%";
-			// connexion à la base de données
-			$cnx = PdoGsb::getPdoGsb();
-			// récuperation des données
-			$lesDonnees = json_decode($_REQUEST['lesdonnees']);
-			$login = $lesDonnees[0];
-			$mdp = $lesDonnees[1];
-			$visiteur = $cnx->getInfosVisiteur($login, $mdp);
-			if (!is_array($visiteur)) {
-				print "Login ou mot de passe invalide%";
-			} else {
-				print "Connexion réussie%";
-				print (json_encode($visiteur);
+if ($_REQUEST["operation"]=="enreg"){
+    $data = $_REQUEST["auth"];
+    $auth = json_decode($data) ;
+    $login = $auth[0] ;
+    $mdp = $auth[1] ;
+	
+    try {
+        $leVisiteur = $pdo->getInfosVisiteur($login,$mdp);
+        
+        if($leVisiteur){
+            print_r("ok");
+            $idVisiteur = $leVisiteur[0];
+            
+            $donnee = $_REQUEST["lesdonnees"];
+            $lesMois = json_decode($donnee);
+            
+            foreach ($lesMois as $unMois){
+                $leMois= $unMois[0];
+                
+                if (!$pdo->existeFicheFrais($idVisiteur, $leMois)){
+                    $pdo->creeNouvellesLignesFrais($idVisiteur, $leMois);
+                    print ("creation fiche");
+                }
+                $data = $_REQUEST["lesdonnees"];
+                $lesDonnees = json_decode($data);
+                foreach ($lesDonnees as $uneDonnee){
+                    $lesFraisForfait = array(
+                        "ETP" => $uneDonnee[1],
+			"KM" => $uneDonnee[2],
+			"NUI" => $uneDonnee[3],
+			"REP" => $uneDonnee[4]);
+                    
+                    $pdo->majFraisForfait($idVisiteur, $leMois, $lesFraisForfait);
+	            print("enregFraisForfait-OK%");
+                    
+                    $lesFraisHf = $uneDonnee[5];
+                    foreach ($lesFraisHf as $unFraisHf){
+                        $annee = substr($leMois, 0, 4);
+			$mois = substr($leMois, 4, 2);
+			$jour = $unFraisHf[0];
+			if (strlen($jour) == 1){
+				$jour = "0" . $jour;
 			}
-		} catch(PDOException $e){
-			print "Erreur !%".$e->getMessage();
-			die();
-		}
-	}elseif($_REQUEST["operation"]=="enreg"){
-		try {
-			print "enreg%";
-			$idVisiteur = $_REQUEST['idVisiteur'];
-			$objetDonnees = json_decode($_REQUEST['lesdonnees']);
-			$lesDonnees = objectToArray($objetDonnees);
-			// connexion à la base de données
-			$cnx = PdoGsb::getPdoGsb();
-			// envoie et saubegardes des données sur la base de données
-			foreach($lesDonnees as $uneLigne) {
-				$annee = $uneLigne['annee'];
-				$mois = $uneLigne['mois'];
-				if (strlen($mois) == 1) {
-					$mois = '0'.$mois;
-				}
-				$anneeMois = $annee.$mois;
-				$lesFrais = array('ETP'=>$uneLigne['etape'], 'NUI'=>$uneLigne['nuitee'],'REP'=>$uneLigne['repas'],'KM'=>$uneLigne['km']);
-				if ($cnx->estPremierFraisMois($idVisiteur, $anneeMois)){
-					$cnx->creeNouvellesLignesFrais($idVisiteur, $anneeMois);
-				}
-				$cnx->majFraisForfait($idVisiteur, $anneeMois, $lesFrais);
-				$lesFraisHF=$uneLigne['lesFraisHF'];
-				if(!empty($lesFraisHF)){
-					foreach($lesFraisHF as $unFraisHF){
-						$jour = $unFraisHF['jour'];
-						$montant = $unFraisHF['montant'];
-						$motif = $unFraisHF['motif'];
-						$date = $jour."/".$mois."/".$annee;
-						$cnx->creeNouveauFraisHorsForfait($idVisiteur, $anneeMois, $motif, $date, $montant);
-					}
-				}
+			$date = $jour . '/' . $mois . '/' . $annee;
+			$montant = $unFraisHf[1];
+			$libelle = $unFraisHf[2];
+					
+			// on vérifie si le frais hors forfait n'est pas déjà enregistré
+			if (!$pdo->existeFraisHorsForfait($idVisiteur, $leMois, $libelle, $date, $montant)){
+				// alors on l'enregistre
+				$pdo->creeNouveauFraisHorsForfait($idVisiteur, $leMois, $libelle, $date, $montant);
+				print("enregFraisHF-OK%");
 			}
-		} catch(PDOException $e){
-			print "Erreur !%".$e->getMessage();
-			die();
-		}
-	}
+                    }
+                }
+            }
+        } else {
+            print ("pas co");
+        }
+    } catch (Exception $e) {
+        print("erreur");
+        die();
+
+    }
 }
-
-
 ?>
