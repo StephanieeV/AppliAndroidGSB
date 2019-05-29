@@ -30,6 +30,7 @@ if ($_REQUEST["operation"]=="enreg"){
                     print"Fiche déjà existante";
                     var_dump($pdo->existeFicheFrais($idVisiteur, $leMois));
                 }
+             }
 
                 $data = $_REQUEST["lesdonnees"];
 
@@ -65,7 +66,7 @@ if ($_REQUEST["operation"]=="enreg"){
                         $pdo->creeNouveauFraisHorsForfait($idVisiteur, $leMois, $libelle, $date, $montant);
                         print("enregFraisHF-OK%");
                         
-                    }
+                    
                 }
             }
         } else {
